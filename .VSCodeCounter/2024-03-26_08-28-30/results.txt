@@ -1,0 +1,47 @@
+Date : 2024-03-26 08:28:30
+Directory : c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src
+Total : 15 files,  913 codes, 9 comments, 149 blanks, all 1071 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Vue        |          9 |        776 |          3 |        136 |        915 |
+| TypeScript |          3 |        134 |          6 |         12 |        152 |
+| JSON       |          3 |          3 |          0 |          1 |          4 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                 | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                    |         15 |        913 |          9 |        149 |      1,071 |
+| . (Files)                                                                                            |          3 |         90 |          9 |         16 |        115 |
+| components                                                                                           |          3 |        174 |          0 |         27 |        201 |
+| data                                                                                                 |          4 |         84 |          0 |          2 |         86 |
+| data (Files)                                                                                         |          1 |         81 |          0 |          1 |         82 |
+| data\maps                                                                                            |          3 |          3 |          0 |          1 |          4 |
+| views                                                                                                |          5 |        565 |          0 |        104 |        669 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                             | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\App.vue                       | Vue        |         37 |          3 |          5 |         45 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\components\BaiduIndex.vue     | Vue        |          3 |          0 |          1 |          4 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\components\DewTemChart.vue    | Vue        |        105 |          0 |         18 |        123 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\components\MapCityToolTip.vue | Vue        |         66 |          0 |          8 |         74 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\data\dew24h.ts                | TypeScript |         81 |          0 |          1 |         82 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\data\maps\cn-gd.geo.json      | JSON       |          1 |          0 |          0 |          1 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\data\maps\cn.geo.json         | JSON       |          1 |          0 |          1 |          2 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\data\maps\gd.geo.json         | JSON       |          1 |          0 |          0 |          1 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\main.ts                       | TypeScript |         13 |          6 |          8 |         27 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\router.ts                     | TypeScript |         40 |          0 |          3 |         43 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\views\HuinanReplay.vue        | Vue        |          3 |          0 |          1 |          4 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\views\Map.vue                 | Vue        |        495 |          0 |         89 |        584 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\views\Overview.vue            | Vue        |         44 |          0 |          8 |         52 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\views\Stats.vue               | Vue        |          6 |          0 |          2 |          8 |
+| c:\Users\25920\Project\2024\DryHelper\01_Preparation\dry-helper-md\src\views\StatsRoot.vue           | Vue        |         17 |          0 |          4 |         21 |
+| Total                                                                                                |            |        913 |          9 |        149 |      1,071 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
