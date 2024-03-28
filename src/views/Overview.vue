@@ -52,22 +52,22 @@ fetchData();
 
 <template>
 	<div id="overview-root" class="root">
-		<div id="overview-content" class="content-container mdui-prose">
+		<div id="overview-content" class="content-container">
 			<mdui-card class="data-stat-card" variant="outlined">
-				<el-row>
-					<el-col :span="6">
-						<el-statistic title="地面温度" :value="rtData.groundTem" suffix="℃" />
-					</el-col>
-					<el-col :span="6">
-						<el-statistic title="相对湿度" :value="rtData.humidity" suffix="%"> </el-statistic>
-					</el-col>
-					<el-col :span="6">
-						<el-statistic title="露点温度" :value="rtData.dewTem" suffix="℃" />
-					</el-col>
-					<el-col :span="6">
-						<el-statistic title="露点地温差" :value="rtData.dewTem - rtData.groundTem" suffix="℃" />
-					</el-col>
-				</el-row>
+				<table class="stat-table">
+					<tr class="stat-table-title">
+						<td>地面温度</td>
+						<td>相对湿度</td>
+						<td>露点温度</td>
+						<td>露点地温差</td>
+					</tr>
+					<tr class="stat-table-value">
+						<td>{{ rtData.groundTem.toFixed(0) }} ℃</td>
+						<td>{{ rtData.humidity.toFixed(0) }} %</td>
+						<td>{{ rtData.dewTem.toFixed(0) }} ℃</td>
+						<td>{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
+					</tr>
+				</table>
 			</mdui-card>
 
 			<h4>24小时温度数据</h4>
@@ -84,13 +84,32 @@ fetchData();
 	/* text-align: center; */
 }
 
+.stat-table {
+	width: 100%;
+	text-align: center;
+
+	.stat-table-title {
+		td {
+			width: 25%;
+		}
+		color: #606266;
+
+		line-height: var(--mdui-typescale-label-medium-line-height);
+		font-size: var(--mdui-typescale-label-medium-size);
+		font-weight: var(--mdui-typescale-label-medium-weight);
+	}
+
+	.stat-table-value {
+		line-height: var(--mdui-typescale-headline-small-line-height);
+		color: #303133;
+		font-size: 20px;
+		font-weight: 400;
+	}
+}
+
 .data-stat-card {
 	width: 100%;
-	padding: 0.8rem 0.4rem;
-
-	.el-col {
-		text-align: center;
-	}
+	padding: 0.6em 0.4em;
 }
 
 .main-chart {

@@ -9,9 +9,6 @@
     }
   ],
   "compilerOptions": {
-    "types": [
-      "element-plus/global"
-    ],
     "resolveJsonModule": true,
     // "esModuleInterop": true,
   }
