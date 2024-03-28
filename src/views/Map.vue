@@ -119,7 +119,8 @@ class ThreeMap {
 		];
 		this.gdMapMaterial = [
 			new THREE.MeshBasicMaterial({
-				color: "#006E1C",
+				color: "#006E1C", // 深绿色
+				// color: "#6F8B70", // 浅绿色
 				transparent: true,
 				opacity: 0.8,
 			}),
@@ -226,19 +227,19 @@ class ThreeMap {
 		// this.cityNameLabels = this.generateCityNameLabel(this.gdMap, gdGeo);
 
 		// 测试Tooltip
-		let gzPos = this.projectionFn([113.544372, 23.329249]);
+		// let gzPos = this.projectionFn([113.544372, 23.329249]);
 		// console.log("广州市坐标: ", gzPos);
-		let labelPos = new THREE.Vector3(gzPos[0] + 1, -gzPos[1] - 0.5, this.gdMapHeight + 3);
-		console.log("Label Position: ", labelPos);
-		this.createCSSLabel(
-			"广州市",
-			[
-				{ key: "气温", value: "31.98℃" },
-				{ key: "湿度", value: "12%" },
-				{ key: "回南天", value: "低概率" },
-			],
-			labelPos
-		);
+		// let labelPos = new THREE.Vector3(gzPos[0] + 1, -gzPos[1] - 0.5, this.gdMapHeight + 3);
+		// console.log("Label Position: ", labelPos);
+		// this.createCSSLabel(
+		// 	"广州市",
+		// 	[
+		// 		{ key: "气温", value: "31.98℃" },
+		// 		{ key: "湿度", value: "12%" },
+		// 		{ key: "回南天", value: "低概率" },
+		// 	],
+		// 	labelPos
+		// );
 
 		// 设置光线
 		this.raycaster = new THREE.Raycaster();
@@ -325,12 +326,12 @@ class ThreeMap {
 			let weatherInfo = gdCityWeathers.value[cityName];
 			if (isGdMap && gdCityWeathers && weatherInfo) {
 				// console.log("Weather Info: ", weatherInfo);
-				let h = weatherInfo.humidity / 100;
-				let c2 = new THREE.Color("#28A1E5");
+				let h = Math.pow(weatherInfo.humidity / 100, 10);
+				let c2 = new THREE.Color("#A2D7F6");
 
 				let newMeshMaterial = meshMaterial[0].clone();
 				newMeshMaterial.color.lerp(c2, h);
-				console.log("New Mesh Material: ", newMeshMaterial.color.getHexString());
+				// console.log("New Mesh Material: ", newMeshMaterial.color.getHexString());
 
 				thisMeshMaterial = [newMeshMaterial, meshMaterial[1]];
 
@@ -409,7 +410,7 @@ class ThreeMap {
 	}
 
 	rayCastUpdate() {
-		let castMeterial = new THREE.MeshBasicMaterial({ color: "#005313", transparent: true, opacity: 0.8 });
+		// let castMeterial = new THREE.MeshBasicMaterial({ color: "#005313", transparent: true, opacity: 0.8 });
 
 		if (!this.mouse) return;
 
@@ -504,8 +505,8 @@ class ThreeMap {
 				},
 				gdLineOpacity: 0.8,
 			},
-			4000
-			// 500
+			// 4000
+			500
 		);
 		tween2.to(
 			{

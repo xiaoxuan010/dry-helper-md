@@ -1,5 +1,18 @@
 <script lang="ts">
+import type { Dialog, Dropdown } from "mdui";
+import AppBarMoreDialog from "@/components/AppBarMoreDialog.vue";
+
+let appBarTitles = {
+	map: "全省天气观察",
+	overview: "回南天气总览",
+	stats: "回南天气统计",
+	default: "雾霭图谱",
+};
+
 export default {
+	components: {
+		AppBarMoreDialog,
+	},
 	data() {
 		return {};
 	},
@@ -13,27 +26,40 @@ export default {
 				this.$router.push({ path: "/" + val });
 			},
 		},
+		appBarTitle() {
+			switch (this.mainRouterID) {
+				case "map":
+				case "overview":
+				case "stats":
+					return appBarTitles[this.mainRouterID];
+				default:
+					return appBarTitles.default;
+			}
+		},
 	},
 	methods: {
-		// getTransitionName(to, from) {},
+		openAppBarDropdown() {
+			// (this.$refs.appBarDropdown as Dropdown).open = true;
+			(this.$refs.appBarDialog as Dialog).open = true;
+		},
 	},
 };
 </script>
 
 <template>
 	<div class="app-root" id="app-root">
-		<!-- <mdui-top-app-bar variant="small">
-		<mdui-button-icon icon="menu"></mdui-button-icon>
-		<mdui-top-app-bar-title>{{ $route.name }}</mdui-top-app-bar-title>
-		<div style="flex-grow: 1"></div>
-		<mdui-button-icon icon="more_vert"></mdui-button-icon>
-	</mdui-top-app-bar> -->
+		<mdui-top-app-bar variant="small">
+			<mdui-button-icon icon="water_drop" href="/#/overview"></mdui-button-icon>
+			<mdui-top-app-bar-title>{{ appBarTitle }}</mdui-top-app-bar-title>
+			<div style="flex-grow: 1"></div>
+			<mdui-button-icon icon="more_vert" ref="appBarMoreBtn" @click="openAppBarDropdown"></mdui-button-icon>
+		</mdui-top-app-bar>
 
-		<!-- <KeepAlive>
-		<RouterView />
-	</KeepAlive> -->
+		<mdui-dialog close-on-overlay-click ref="appBarDialog">
+			<AppBarMoreDialog ref="appBarDropdown" />
+		</mdui-dialog>
 
-		<RouterView v-slot="{ Component, route }" class="main-router-view">
+		<RouterView v-slot="{ Component }" class="main-router-view">
 			<transition name="fade">
 				<KeepAlive>
 					<component :is="Component" />
@@ -50,6 +76,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+#appBarDropdown {
+	position: fixed;
+	width: 100vh;
+	right: 0;
+}
+
 .main-router-view {
 	position: absolute;
 	width: 98%;
