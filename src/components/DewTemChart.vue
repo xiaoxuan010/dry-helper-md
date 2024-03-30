@@ -4,17 +4,15 @@ import type { Ref } from "vue";
 
 import { use } from "echarts/core";
 
-import { CanvasRenderer } from "echarts/renderers";
+import { SVGRenderer } from "echarts/renderers";
 import { LineChart, BarChart } from "echarts/charts";
 import { TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent } from "echarts/components";
 
-import type { EChartsOption, DatasetComponentOption } from "echarts";
+import type { EChartsOption } from "echarts";
 
 import VChart from "vue-echarts";
 
-import rangeTemToolTip from "./rangeTemToolTip.vue";
-
-use([CanvasRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
+use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
 
 const props = defineProps<{
 	data: Array<{ time: number; groundTem: number; airTem: number; dewTem: number }>;
@@ -82,8 +80,8 @@ const option = computed<EChartsOption>(() => ({
 		type: "value",
 	},
 	series: [
-		{ type: "line", name: "空气温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 } },
 		{ type: "line", name: "地面温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 } },
+		{ type: "line", name: "空气温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 } },
 		{ type: "line", name: "露点温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 3 } },
 	],
 }));
