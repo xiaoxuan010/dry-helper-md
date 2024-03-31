@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Dialog, Dropdown } from "mdui";
+import type { Dialog } from "mdui";
 import AppBarMoreDialog from "@/components/AppBarMoreDialog.vue";
 
 let appBarTitles = {
