@@ -31,3 +31,4 @@ coverage
 
 # VSCode Counter
 .VSCodeCounter/*
+.vercel
