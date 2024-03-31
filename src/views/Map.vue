@@ -211,10 +211,18 @@ class ThreeMap {
 		this.raycaster = new THREE.Raycaster();
 		const onMouseMove = (event: MouseEvent) => {
 			this.mouse = new THREE.Vector2((event.offsetX / this.canvasWidth) * 2 - 1, -(event.offsetY / this.canvasHeight) * 2 + 1);
-
-			// console.log("Mouse: ", this.mouse);
 		};
 		threeMapDiv.value?.addEventListener("mousemove", onMouseMove, false);
+		const onMouseClick = (event: MouseEvent) => {
+			if (!this.rayCastUpdate()) {
+				this.hoverCityName.value = "";
+				if (this.cityTooltip) {
+					this.scene2.remove(this.cityTooltip);
+					this.cityTooltip = null;
+				}
+			}
+		};
+		threeMapDiv.value?.addEventListener("click", onMouseClick, false);
 
 		this.zoomInAnimation();
 	}
@@ -320,8 +328,8 @@ class ThreeMap {
 		return map;
 	}
 
-	rayCastUpdate() {
-		if (!this.mouse) return;
+	rayCastUpdate(): boolean {
+		if (!this.mouse) return false;
 
 		this.raycaster.setFromCamera(this.mouse, this.camera);
 		const intersects = this.raycaster.intersectObjects(this.gdCityMeshes, true);
@@ -334,28 +342,36 @@ class ThreeMap {
 				});
 		}
 
-		this.lastPick = intersects[0] ? intersects[0].object.parent : null;
-		// console.log(intersects);
-		if (this.lastPick) {
-			this.lastPick.children.forEach(object => {
-				if (object.type === "Mesh") {
-					((object as THREE.Mesh).material as THREE.MeshBasicMaterial[])[0].opacity = 1;
+		if (!intersects[0]) {
+			return false;
+		} else {
+			this.lastPick = intersects[0].object.parent;
+
+			// console.log(intersects);
+			if (!this.lastPick) {
+				return false;
+			} else {
+				this.lastPick.children.forEach(object => {
+					if (object.type === "Mesh") {
+						((object as THREE.Mesh).material as THREE.MeshBasicMaterial[])[0].opacity = 1;
+					}
+				});
+				let cityName = this.lastPick.name;
+				this.hoverCityName.value = cityName;
+
+				// let cityPos = this.projectionFn(gdGeo.features.find(feature => feature.properties?.name == cityName)?.properties?.centroid);
+				// console.log("市坐标: ", cityPos);
+				// let labelPos = new THREE.Vector3(cityPos[0] + 1, -cityPos[1] - 0.5, this.gdMapHeight + 3);
+				let labelPos = new THREE.Vector3(intersects[0]?.point.x + 1, intersects[0]?.point.y - 1, intersects[0]?.point.z);
+				if (!this.cityTooltipPos) this.cityTooltipPos = labelPos;
+				else this.cityTooltipPos.copy(labelPos);
+
+				if (!this.cityTooltip) {
+					this.cityTooltip = this.createCSSLabel(labelPos);
 				}
-			});
-			let cityName = this.lastPick.name;
-			this.hoverCityName.value = cityName;
-
-			// let cityPos = this.projectionFn(gdGeo.features.find(feature => feature.properties?.name == cityName)?.properties?.centroid);
-			// console.log("市坐标: ", cityPos);
-			// let labelPos = new THREE.Vector3(cityPos[0] + 1, -cityPos[1] - 0.5, this.gdMapHeight + 3);
-			let labelPos = new THREE.Vector3(intersects[0]?.point.x + 1, intersects[0]?.point.y - 1, intersects[0]?.point.z);
-			if (!this.cityTooltipPos) this.cityTooltipPos = labelPos;
-			else this.cityTooltipPos.copy(labelPos);
-
-			if (!this.cityTooltip) {
-				this.cityTooltip = this.createCSSLabel(labelPos);
 			}
 		}
+		return true;
 	}
 
 	createCSSLabel(initPos: THREE.Vector3) {
