@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MapCityToolTip from "@/components/MapCityToolTip.vue";
 
-import { onMounted, onUnmounted, ref, type Ref, createApp } from "vue";
+import { onMounted, onUnmounted, ref, type Ref, createApp, computed } from "vue";
 
 import * as THREE from "three";
 import * as d3 from "d3";
@@ -20,7 +20,7 @@ import * as gdGeoJson from "@/data/maps/gd.geo.json";
 const threeMapDiv: Ref<HTMLElement | null> = ref(null);
 const cityNameLabelDiv: Ref<HTMLElement | null> = ref(null);
 
-const gdCityWeathers: Ref<{ [key: string]: { temperature: number; humidity: number; weatherDescription: string; reportTime: string } }> = ref({});
+const gdCityWeathers: Ref<{ [key: string]: { temperature: number; humidity: number; range: string; reportTime: string } }> = ref({});
 
 async function fetchGdData() {
 	const API_PREFIX = "/api";
@@ -35,7 +35,7 @@ async function fetchGdData() {
 				let weatherFeatures = {
 					temperature: info.temperature,
 					humidity: info.humidity,
-					weatherDescription: info.weather,
+					range: info.range,
 					reportTime: info.reporttime,
 				};
 				gdCityWeathers.value[cityName] = weatherFeatures;
@@ -95,6 +95,10 @@ class ThreeMap {
 	projectionFn: Function;
 	scene2: THREE.Scene;
 	renderCSS3D: CSS3DRenderer;
+	cityTooltip: CSS3DObject | null = null;
+	hoverCityName: Ref<string> = ref("");
+	posTween: any;
+	cityTooltipPos: THREE.Vector3 | null = null;
 
 	constructor(divElement: HTMLElement, cityLabelDivElement: HTMLElement, width: number, height: number) {
 		// 新建场景
@@ -119,8 +123,8 @@ class ThreeMap {
 		];
 		this.gdMapMaterial = [
 			new THREE.MeshBasicMaterial({
-				color: "#006E1C", // 深绿色
-				// color: "#6F8B70", // 浅绿色
+				// color: "#006E1C", // 深绿色
+				color: "#B1CBB3", // 浅绿色
 				transparent: true,
 				opacity: 0.8,
 			}),
@@ -214,7 +218,7 @@ class ThreeMap {
 		this.cnMapHeight = 0.4;
 		this.gdMapHeight = 1.2;
 		this.cnMap = this.generateMap(cnGeo, this.cnMapHeight, this.cnMapMaterial, this.lineMaterial);
-		this.gdMap = this.generateMap(gdGeo, this.gdMapHeight, this.gdMapMaterial, this.gdLineMaterial, true);
+		this.gdMap = this.generateMap(gdGeo, this.gdMapHeight, this.cnMapMaterial, this.gdLineMaterial, true);
 		this.gdMap.position.z = this.cnMapHeight - this.gdMapHeight;
 		this.gdCityMeshes = [];
 		this.gdMap.children.forEach(city => {
@@ -225,21 +229,6 @@ class ThreeMap {
 
 		// 生成城市名称标签
 		// this.cityNameLabels = this.generateCityNameLabel(this.gdMap, gdGeo);
-
-		// 测试Tooltip
-		// let gzPos = this.projectionFn([113.544372, 23.329249]);
-		// console.log("广州市坐标: ", gzPos);
-		// let labelPos = new THREE.Vector3(gzPos[0] + 1, -gzPos[1] - 0.5, this.gdMapHeight + 3);
-		// console.log("Label Position: ", labelPos);
-		// this.createCSSLabel(
-		// 	"广州市",
-		// 	[
-		// 		{ key: "气温", value: "31.98℃" },
-		// 		{ key: "湿度", value: "12%" },
-		// 		{ key: "回南天", value: "低概率" },
-		// 	],
-		// 	labelPos
-		// );
 
 		// 设置光线
 		this.raycaster = new THREE.Raycaster();
@@ -317,25 +306,15 @@ class ThreeMap {
 
 		geoData.features.forEach(feature => {
 			const parentObject = new THREE.Object3D();
-
 			let cityName = feature.properties?.name;
 			parentObject.name = cityName;
 
 			let thisMeshMaterial: THREE.MeshBasicMaterial[] = meshMaterial;
 
-			let weatherInfo = gdCityWeathers.value[cityName];
-			if (isGdMap && gdCityWeathers && weatherInfo) {
-				// console.log("Weather Info: ", weatherInfo);
-				let h = Math.pow(weatherInfo.humidity / 100, 10);
-				let c2 = new THREE.Color("#A2D7F6");
-
+			if (isGdMap) {
 				let newMeshMaterial = meshMaterial[0].clone();
-				newMeshMaterial.color.lerp(c2, h);
-				// console.log("New Mesh Material: ", newMeshMaterial.color.getHexString());
 
 				thisMeshMaterial = [newMeshMaterial, meshMaterial[1]];
-
-				// console.log(meshMaterial);
 			}
 
 			if (feature.geometry.type === "Polygon") {
@@ -426,36 +405,87 @@ class ThreeMap {
 		}
 
 		this.lastPick = intersects[0] ? intersects[0].object.parent : null;
-		// if (this.lastPick) console.log(this.lastPick);
+		// console.log(intersects);
 		if (this.lastPick) {
 			this.lastPick.children.forEach(object => {
 				if (object.type === "Mesh") {
 					((object as THREE.Mesh).material as THREE.MeshBasicMaterial[])[0].opacity = 1;
 				}
 			});
+			// console.log(this.lastPick);
+			let cityName = this.lastPick.name;
+			this.hoverCityName.value = cityName;
+
+			let cityPos = this.projectionFn(gdGeo.features.find(feature => feature.properties?.name == cityName)?.properties?.centroid);
+			// console.log("市坐标: ", cityPos);
+			// let labelPos = new THREE.Vector3(cityPos[0] + 1, -cityPos[1] - 0.5, this.gdMapHeight + 3);
+			let labelPos = new THREE.Vector3(intersects[0]?.point.x + 1, intersects[0]?.point.y - 1, intersects[0]?.point.z);
+			if (!this.cityTooltipPos) this.cityTooltipPos = labelPos;
+			else this.cityTooltipPos.copy(labelPos);
+
+			if (!this.cityTooltip) {
+				this.cityTooltip = this.createCSSLabel(labelPos);
+			}
 		}
 	}
 
-	createCSSLabel(title: string, content: any, position: THREE.Vector3) {
-		let labelDiv = document.createElement("div");
-
-		const tooltip = createApp(MapCityToolTip, { title, params: content }).mount(labelDiv);
-
+	createCSSLabel(initPos: THREE.Vector3) {
 		// let label = new CSS2DObject(labelDiv);
+		// let label = new CSS3DObject(labelDiv);
+		let title = this.hoverCityName;
+
+		let labelDiv = document.createElement("div");
+		const tooltip = createApp(MapCityToolTip, {
+			title,
+			params: this.getTooltipContent,
+		}).mount(labelDiv);
 		let label = new CSS3DObject(labelDiv);
-
-		label.position.copy(position);
-
 		label.rotateX(Math.PI / 4);
 		label.rotateY(-Math.PI / 15);
 		// label.rotateZ(Math.PI / 15);
 		label.scale.set(0.05, 0.05, 0.05);
+		label.position.copy(initPos);
 
-		// this.scene.add(label);
 		this.scene2.add(label);
-		// this.gdMap.add(label);
 
 		return label;
+	}
+
+	getTooltipContent = computed(() => {
+		return [
+			{ key: "气温", value: gdCityWeathers.value[this.hoverCityName.value].temperature + "℃" },
+			{ key: "湿度", value: gdCityWeathers.value[this.hoverCityName.value].humidity + "%" },
+			{ key: "回南天", value: gdCityWeathers.value[this.hoverCityName.value].range },
+		];
+	});
+
+	updateCSSLabel() {
+		if (this.cityTooltip && this.cityTooltipPos) {
+			// if (!this.posTween) {
+			// 	this.posTween = new TWEEN.Tween(this.cityTooltip.position)
+			// 		.to(this.cityTooltipPos, 2000)
+			// 		.dynamic(true)
+			// 		.duration(2000)
+			// 		.easing(TWEEN.Easing.Quartic.InOut)
+			// 		.startFromCurrentValues()
+			// 		.onComplete(() => {
+			// 			console.log("动画结束");
+			// 			// requestAnimationFrame(() => {
+			// 			this.posTween = null;
+			// 			// });
+			// 		});
+			// 	console.log("开始动画: 从", this.cityTooltip.position, "到", this.cityTooltipPos);
+			// }
+			const speed = 1;
+
+			const dx = this.cityTooltipPos.x - this.cityTooltip.position.x;
+			const dy = this.cityTooltipPos.y - this.cityTooltip.position.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
+			const velocity = Math.min(0.05, distance / speed);
+
+			this.cityTooltip.position.x += dx * velocity;
+			this.cityTooltip.position.y += dy * velocity;
+		}
 	}
 
 	animate() {
@@ -463,6 +493,7 @@ class ThreeMap {
 		this.rayCastUpdate();
 
 		TWEEN.update();
+		this.updateCSSLabel();
 
 		if (this.controller2) this.controller2.update();
 		if (this.controller) this.controller.update();
@@ -471,15 +502,9 @@ class ThreeMap {
 
 	zoomInAnimation() {
 		let ease1 = {
-			x: this.camera.position.x,
-			y: this.camera.position.y,
-			z: this.camera.position.z,
+			cameraPos: this.camera.position,
 			cnMapOpacity: this.cnMapMaterial[0].opacity,
-			orbitCenter: {
-				x: this.controllerConfig.target.x,
-				y: this.controllerConfig.target.y,
-				z: this.controllerConfig.target.z,
-			},
+			orbitCenter: this.controllerConfig.target,
 		};
 		let ease2 = {
 			z: this.cnMapHeight - this.gdMapHeight,
@@ -488,25 +513,41 @@ class ThreeMap {
 			gdLineOpacity: this.gdLineMaterial.opacity,
 			cityNameLabelOpacity: -1,
 		};
+		let cityMapColorEase = new Object() as { [key: string]: THREE.Color };
+		this.gdMap.children.forEach(city => {
+			cityMapColorEase[city.name] = (
+				(city.children.find(obj => obj.type == "Mesh") as THREE.Mesh).material as THREE.MeshBasicMaterial[]
+			)[0].color;
+		});
+		// console.log(cityMapEase);
+		let cityMapColorTarget = new Object() as { [key: string]: THREE.Color };
+		for (let key in cityMapColorEase) {
+			cityMapColorTarget[key] = cityMapColorEase[key];
+			let weatherInfo = gdCityWeathers.value[key];
+			if (weatherInfo) {
+				let h = Math.pow(weatherInfo.humidity / 100, 10);
+				let c2 = new THREE.Color("#619A7F"); // 浅绿
+				// let c2 = new THREE.Color("#006E1C"); // 深绿
+
+				cityMapColorTarget[key] = cityMapColorTarget[key].clone();
+				cityMapColorTarget[key].lerp(c2, h);
+			}
+		}
+
+		let cityMapTween = new TWEEN.Tween(cityMapColorEase).to(cityMapColorTarget, 1000).easing(TWEEN.Easing.Quartic.Out);
+
 		let tween = new TWEEN.Tween(ease1);
 		let tween2 = new TWEEN.Tween(ease2);
 		let tween3 = new TWEEN.Tween(ease3);
 
 		tween.to(
 			{
-				x: 33,
-				y: -65,
-				z: 25,
+				cameraPos: new THREE.Vector3(33, -65, 25),
 				cnMapOpacity: 0.1,
-				orbitCenter: {
-					x: this.provinceTargetPos.x,
-					y: this.provinceTargetPos.y,
-					z: this.provinceTargetPos.z,
-				},
-				gdLineOpacity: 0.8,
+				orbitCenter: this.provinceTargetPos,
 			},
-			// 4000
-			500
+			4000
+			// 500
 		);
 		tween2.to(
 			{
@@ -524,20 +565,18 @@ class ThreeMap {
 
 		// tween.delay(500);
 		tween.easing(TWEEN.Easing.Quartic.InOut);
+		tween2.easing(TWEEN.Easing.Quartic.Out);
+		tween3.easing(TWEEN.Easing.Quartic.Out);
+
 		tween.start();
 
-		// tween2.delay(3000);
-		tween2.easing(TWEEN.Easing.Quartic.Out);
-		tween2.start();
-
-		// tween3.delay(3000);
-		tween3.easing(TWEEN.Easing.Quartic.Out);
-		tween3.start();
+		tween2.delay(3200).start();
+		tween3.delay(3000).start();
+		cityMapTween.delay(4000).start();
 
 		tween.onUpdate(() => {
-			this.camera.position.set(ease1.x, ease1.y, ease1.z);
-			this.controller.target.set(ease1.orbitCenter.x, ease1.orbitCenter.y, ease1.orbitCenter.z);
-			this.controller2?.target.set(ease1.orbitCenter.x, ease1.orbitCenter.y, ease1.orbitCenter.z);
+			this.controller.target.copy(ease1.orbitCenter);
+			this.controller2?.target.copy(ease1.orbitCenter);
 
 			this.cnMapMaterial[0].opacity = ease1.cnMapOpacity;
 		});

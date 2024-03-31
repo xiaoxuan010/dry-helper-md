@@ -2,9 +2,9 @@
 	<div class="tooltip-container mdui-prose" id="map-city-tool-tip">
 		<div class="tooltip-content">
 			<div class="tooltip-line tooltip-title">
-				<span>{{ title }}</span>
+				<span>{{ title.value }}</span>
 			</div>
-			<div class="tooltip-line" v-for="(item, index) in params" :key="index">
+			<div class="tooltip-line" v-for="(item, index) in params?.value" :key="index">
 				<span class="line-subtitle">{{ item.key }}</span>
 				<span class="line-value">{{ item.value }}</span>
 			</div>
@@ -12,16 +12,24 @@
 	</div>
 </template>
 
-<script lang="ts">
-export default {
-	props: {
-		title: String,
-		params: Object,
+<script setup lang="ts">
+import type { PropType, Ref, ComputedRef } from "vue";
+import { onMounted } from "vue";
+
+const props = defineProps({
+	title: {
+		type: Object as PropType<Ref<String>>,
+		required: true,
 	},
-	mounted() {
-		// console.log(this.params);
+	params: {
+		type: Object as PropType<ComputedRef>,
 	},
-};
+});
+
+onMounted(() => {
+	// console.log(props.title.value);
+	// console.log(props.params?.value);
+});
 </script>
 
 <style scoped lang="scss">

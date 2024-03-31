@@ -84,7 +84,7 @@ export default {
 
 .main-router-view {
 	position: absolute;
-	width: 98%;
+	width: 100%;
 }
 
 .fade-enter-active,
