@@ -5,10 +5,7 @@ import router from "./router";
 // MDUI 全量导入
 import "mdui/mdui.css";
 import "mdui";
-import { setColorScheme, setTheme } from "mdui";
-
-// Echarts 全量导入
-// import "echarts";
+import { setColorScheme } from "mdui";
 
 const app = createApp(App);
 
@@ -16,6 +13,5 @@ app.use(router);
 
 // 配色设置
 setColorScheme("#78DC77");
-// setTheme("auto");
 
 app.mount("#app");

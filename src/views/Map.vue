@@ -12,7 +12,6 @@ import axios from "axios";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/Addons.js";
-import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/Addons.js";
 
 import * as cnGeoJson from "@/data/maps/cn.geo.json";
 import * as gdGeoJson from "@/data/maps/gd.geo.json";
@@ -165,13 +164,6 @@ class ThreeMap {
 		this.renderCSS3D.domElement.style.top = "0";
 		cityLabelDivElement.appendChild(this.renderCSS3D.domElement);
 
-		// this.labelRenderer = new CSS2DRenderer();
-		// this.labelRenderer.setSize(this.canvasWidth, this.canvasHeight);
-		// this.labelRenderer.domElement.style.position = "absolute";
-		// this.labelRenderer.domElement.style.top = "0";
-		// this.labelRenderer.domElement.style.pointerEvents = "none";
-		// cityLabelDivElement.appendChild(this.labelRenderer.domElement);
-
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true,
 			alpha: true,
@@ -180,8 +172,6 @@ class ThreeMap {
 		this.renderer.setSize(this.canvasWidth, this.canvasHeight);
 		this.renderer.setPixelRatio(deviceDpr);
 		divElement.appendChild(this.renderer.domElement);
-
-		// this.renderCSS3D.domElement.appendChild(this.renderer.domElement);
 
 		// 设置控制器
 		this.controllerConfig = {
@@ -203,16 +193,6 @@ class ThreeMap {
 		this.controller.minPolarAngle = this.controllerConfig.minPolarAngle;
 		this.controller.maxPolarAngle = this.controllerConfig.maxPolarAngle;
 		this.controller.zoomSpeed = this.controllerConfig.zoomSpeed;
-		// CSS3D控制器
-		// this.controller2 = new OrbitControls(this.camera, this.renderCSS3D.domElement);
-		// this.controller2.target.copy(this.controllerConfig.target);
-		// this.controller2.enableDamping = this.controllerConfig.enableDamping;
-		// this.controller2.dampingFactor = this.controllerConfig.dampingFactor;
-		// this.controller2.minAzimuthAngle = this.controllerConfig.minAzimuthAngle;
-		// this.controller2.maxAzimuthAngle = this.controllerConfig.maxAzimuthAngle;
-		// this.controller2.minPolarAngle = this.controllerConfig.minPolarAngle;
-		// this.controller2.maxPolarAngle = this.controllerConfig.maxPolarAngle;
-		// this.controller2.zoomSpeed = this.controllerConfig.zoomSpeed;
 
 		// 生成地图
 		this.cnMapHeight = 0.4;
@@ -226,9 +206,6 @@ class ThreeMap {
 				if (object.type == "Mesh") this.gdCityMeshes.push(object);
 			});
 		});
-
-		// 生成城市名称标签
-		// this.cityNameLabels = this.generateCityNameLabel(this.gdMap, gdGeo);
 
 		// 设置光线
 		this.raycaster = new THREE.Raycaster();
@@ -343,54 +320,7 @@ class ThreeMap {
 		return map;
 	}
 
-	generateCityNameLabel(map: THREE.Object3D<THREE.Object3DEventMap>, mapUnitGeo: GeoJSON.FeatureCollection) {
-		let mapProjection = this.projectionFn;
-
-		let spriteGroup = new THREE.Group();
-
-		map.children.forEach(city => {
-			let canvas = document.createElement("canvas");
-			canvas.width = 48;
-			canvas.height = 24;
-			let ctx = canvas.getContext("2d");
-			if (ctx) {
-				ctx.fillStyle = "#FCFDF6";
-				ctx.font = "24px Roboto";
-				ctx.fillText(city.name.replace("市", ""), 0, 20);
-
-				let texture = new THREE.Texture(canvas);
-				texture.needsUpdate = true;
-				let material = new THREE.SpriteMaterial({
-					map: texture,
-					// sizeAttenuation: false,
-					opacity: 0,
-				});
-
-				let sprite = new THREE.Sprite(material);
-				let scale = 0.07 * 20;
-				sprite.scale.set(scale, scale / 2, 1);
-
-				let cityCenter = mapUnitGeo.features.find(feature => feature.properties?.name == city.name)?.properties?.centroid;
-				let cityCenterPos = mapProjection(cityCenter);
-
-				if (!cityCenterPos) {
-					console.error("[generateCityNameLabel]Unexpected result from projection: ", cityCenterPos);
-				} else {
-					sprite.position.set(cityCenterPos[0], -cityCenterPos[1], this.gdMapHeight + 0.3);
-					spriteGroup.add(sprite);
-				}
-			} else {
-				console.error("Canvas 2D Context is null");
-			}
-		});
-
-		this.scene.add(spriteGroup);
-		return spriteGroup;
-	}
-
 	rayCastUpdate() {
-		// let castMeterial = new THREE.MeshBasicMaterial({ color: "#005313", transparent: true, opacity: 0.8 });
-
 		if (!this.mouse) return;
 
 		this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -412,11 +342,10 @@ class ThreeMap {
 					((object as THREE.Mesh).material as THREE.MeshBasicMaterial[])[0].opacity = 1;
 				}
 			});
-			// console.log(this.lastPick);
 			let cityName = this.lastPick.name;
 			this.hoverCityName.value = cityName;
 
-			let cityPos = this.projectionFn(gdGeo.features.find(feature => feature.properties?.name == cityName)?.properties?.centroid);
+			// let cityPos = this.projectionFn(gdGeo.features.find(feature => feature.properties?.name == cityName)?.properties?.centroid);
 			// console.log("市坐标: ", cityPos);
 			// let labelPos = new THREE.Vector3(cityPos[0] + 1, -cityPos[1] - 0.5, this.gdMapHeight + 3);
 			let labelPos = new THREE.Vector3(intersects[0]?.point.x + 1, intersects[0]?.point.y - 1, intersects[0]?.point.z);
@@ -430,8 +359,6 @@ class ThreeMap {
 	}
 
 	createCSSLabel(initPos: THREE.Vector3) {
-		// let label = new CSS2DObject(labelDiv);
-		// let label = new CSS3DObject(labelDiv);
 		let title = this.hoverCityName;
 
 		let labelDiv = document.createElement("div");
@@ -442,7 +369,6 @@ class ThreeMap {
 		let label = new CSS3DObject(labelDiv);
 		label.rotateX(Math.PI / 4);
 		label.rotateY(-Math.PI / 15);
-		// label.rotateZ(Math.PI / 15);
 		label.scale.set(0.05, 0.05, 0.05);
 		label.position.copy(initPos);
 
@@ -461,21 +387,6 @@ class ThreeMap {
 
 	updateCSSLabel() {
 		if (this.cityTooltip && this.cityTooltipPos) {
-			// if (!this.posTween) {
-			// 	this.posTween = new TWEEN.Tween(this.cityTooltip.position)
-			// 		.to(this.cityTooltipPos, 2000)
-			// 		.dynamic(true)
-			// 		.duration(2000)
-			// 		.easing(TWEEN.Easing.Quartic.InOut)
-			// 		.startFromCurrentValues()
-			// 		.onComplete(() => {
-			// 			console.log("动画结束");
-			// 			// requestAnimationFrame(() => {
-			// 			this.posTween = null;
-			// 			// });
-			// 		});
-			// 	console.log("开始动画: 从", this.cityTooltip.position, "到", this.cityTooltipPos);
-			// }
 			const speed = 1;
 
 			const dx = this.cityTooltipPos.x - this.cityTooltip.position.x;
@@ -501,26 +412,76 @@ class ThreeMap {
 	}
 
 	zoomInAnimation() {
+		// 动画1：相机移动、全国地图淡出
 		let ease1 = {
 			cameraPos: this.camera.position,
 			cnMapOpacity: this.cnMapMaterial[0].opacity,
 			orbitCenter: this.controllerConfig.target,
 		};
+		let tween1 = new TWEEN.Tween(ease1)
+			.to(
+				{
+					cameraPos: new THREE.Vector3(33, -65, 25),
+					cnMapOpacity: 0.1,
+					orbitCenter: this.provinceTargetPos,
+				},
+				4000
+				// 500
+			)
+			.onUpdate(() => {
+				this.controller.target.copy(ease1.orbitCenter);
+				this.controller2?.target.copy(ease1.orbitCenter);
+
+				this.cnMapMaterial[0].opacity = ease1.cnMapOpacity;
+			})
+			.easing(TWEEN.Easing.Quartic.InOut);
+
+		// 动画2：广东地图上升
 		let ease2 = {
 			z: this.cnMapHeight - this.gdMapHeight,
 		};
+		let tween2 = new TWEEN.Tween(ease2)
+			.to(
+				{
+					z: 0,
+				},
+				1500
+			)
+			.easing(TWEEN.Easing.Quartic.Out)
+			.onUpdate(() => {
+				this.gdMap.position.z = ease2.z;
+			});
+
+		// 动画3：广东地图线条、城市名标签淡入
 		let ease3 = {
 			gdLineOpacity: this.gdLineMaterial.opacity,
 			cityNameLabelOpacity: -1,
 		};
+		let tween3 = new TWEEN.Tween(ease3)
+			.to(
+				{
+					gdLineOpacity: 0.8,
+					cityNameLabelOpacity: 0.8,
+				},
+				5000
+			)
+			.easing(TWEEN.Easing.Quartic.Out)
+			.onUpdate(() => {
+				this.gdLineMaterial.opacity = ease3.gdLineOpacity;
+				this.cityNameLabels.children.forEach(sprite => {
+					(sprite as THREE.Sprite).material.opacity = Math.max(0, ease3.cityNameLabelOpacity);
+				});
+			});
+
+		// 动画4：广东地图城市颜色渐变
 		let cityMapColorEase = new Object() as { [key: string]: THREE.Color };
 		this.gdMap.children.forEach(city => {
 			cityMapColorEase[city.name] = (
 				(city.children.find(obj => obj.type == "Mesh") as THREE.Mesh).material as THREE.MeshBasicMaterial[]
 			)[0].color;
 		});
-		// console.log(cityMapEase);
 		let cityMapColorTarget = new Object() as { [key: string]: THREE.Color };
+		let cityMapTween = new TWEEN.Tween(cityMapColorEase).to(cityMapColorTarget, 2000).easing(TWEEN.Easing.Quartic.Out);
 		for (let key in cityMapColorEase) {
 			cityMapColorTarget[key] = cityMapColorEase[key];
 			let weatherInfo = gdCityWeathers.value[key];
@@ -534,64 +495,11 @@ class ThreeMap {
 			}
 		}
 
-		let cityMapTween = new TWEEN.Tween(cityMapColorEase).to(cityMapColorTarget, 1000).easing(TWEEN.Easing.Quartic.Out);
-
-		let tween = new TWEEN.Tween(ease1);
-		let tween2 = new TWEEN.Tween(ease2);
-		let tween3 = new TWEEN.Tween(ease3);
-
-		tween.to(
-			{
-				cameraPos: new THREE.Vector3(33, -65, 25),
-				cnMapOpacity: 0.1,
-				orbitCenter: this.provinceTargetPos,
-			},
-			4000
-			// 500
-		);
-		tween2.to(
-			{
-				z: 0,
-			},
-			1500
-		);
-		tween3.to(
-			{
-				gdLineOpacity: 0.8,
-				cityNameLabelOpacity: 0.8,
-			},
-			5000
-		);
-
-		// tween.delay(500);
-		tween.easing(TWEEN.Easing.Quartic.InOut);
-		tween2.easing(TWEEN.Easing.Quartic.Out);
-		tween3.easing(TWEEN.Easing.Quartic.Out);
-
-		tween.start();
-
+		// 动画开始
+		tween1.start();
 		tween2.delay(3200).start();
 		tween3.delay(3000).start();
 		cityMapTween.delay(4000).start();
-
-		tween.onUpdate(() => {
-			this.controller.target.copy(ease1.orbitCenter);
-			this.controller2?.target.copy(ease1.orbitCenter);
-
-			this.cnMapMaterial[0].opacity = ease1.cnMapOpacity;
-		});
-
-		tween2.onUpdate(() => {
-			this.gdMap.position.z = ease2.z;
-			// console.log(this.gdLineMaterial.opacity);
-		});
-
-		tween3.onUpdate(() => {
-			this.gdLineMaterial.opacity = ease3.gdLineOpacity;
-			this.cityNameLabels.children.forEach(sprite => {
-				(sprite as THREE.Sprite).material.opacity = Math.max(0, ease3.cityNameLabelOpacity);
-			});
-		});
 	}
 }
 

@@ -25,11 +25,6 @@ const props = defineProps({
 		type: Object as PropType<ComputedRef>,
 	},
 });
-
-onMounted(() => {
-	// console.log(props.title.value);
-	// console.log(props.params?.value);
-});
 </script>
 
 <style scoped lang="scss">
@@ -55,7 +50,6 @@ div.tooltip-container {
 
 		div.tooltip-title {
 			text-align: center;
-			// margin-bottom: 0.2em;
 		}
 
 		div.tooltip-line {

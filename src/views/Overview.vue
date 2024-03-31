@@ -2,7 +2,6 @@
 import { ref } from "vue";
 
 import DewTemChart from "@/components/DewTemChart.vue";
-// import dew24h from "@/data/dew24h";
 
 import axios from "axios";
 
@@ -52,68 +51,73 @@ fetchData();
 
 <template>
 	<div id="overview-root" class="root">
-		<div id="overview-content" class="content-container">
-			<mdui-card class="data-stat-card" variant="outlined">
-				<table class="stat-table">
-					<tr class="stat-table-title">
-						<td>地面温度</td>
-						<td>相对湿度</td>
-						<td>露点温度</td>
-						<td>露点地温差</td>
-					</tr>
-					<tr class="stat-table-value">
-						<td>{{ rtData.groundTem.toFixed(0) }} ℃</td>
-						<td>{{ rtData.humidity.toFixed(0) }} %</td>
-						<td>{{ rtData.dewTem.toFixed(0) }} ℃</td>
-						<td>{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
-					</tr>
-				</table>
-			</mdui-card>
+		<mdui-card class="data-stat-card" variant="outlined">
+			<table class="stat-table">
+				<tr class="stat-table-title">
+					<td>地面温度</td>
+					<td>相对湿度</td>
+					<td>露点温度</td>
+					<td>露点地温差</td>
+				</tr>
+				<tr class="stat-table-value">
+					<td>{{ rtData.groundTem.toFixed(0) }} ℃</td>
+					<td>{{ rtData.humidity.toFixed(0) }} %</td>
+					<td>{{ rtData.dewTem.toFixed(0) }} ℃</td>
+					<td>{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
+				</tr>
+			</table>
+		</mdui-card>
 
+		<div id="overview-content" class="content-container mdui-prose">
 			<h4>24小时温度数据</h4>
-
 			<DewTemChart :data="rangeData" class="main-chart" />
 		</div>
 	</div>
 </template>
 
 <style scoped lang="scss">
-.content-container {
+.root {
 	width: 98%;
-	margin: 0 auto;
-	/* text-align: center; */
-}
-
-.stat-table {
-	width: 100%;
 	text-align: center;
 
-	.stat-table-title {
-		td {
-			width: 25%;
+	.data-stat-card {
+		width: 98%;
+		padding: 0.6em 0.4em;
+
+		.stat-table {
+			width: 100%;
+			text-align: center;
+
+			.stat-table-title {
+				td {
+					width: 25%;
+				}
+				color: #606266;
+
+				line-height: var(--mdui-typescale-label-medium-line-height);
+				font-size: var(--mdui-typescale-label-medium-size);
+				font-weight: var(--mdui-typescale-label-medium-weight);
+			}
+
+			.stat-table-value {
+				line-height: var(--mdui-typescale-headline-small-line-height);
+				color: #303133;
+				font-size: 20px;
+				font-weight: 400;
+			}
 		}
-		color: #606266;
-
-		line-height: var(--mdui-typescale-label-medium-line-height);
-		font-size: var(--mdui-typescale-label-medium-size);
-		font-weight: var(--mdui-typescale-label-medium-weight);
 	}
 
-	.stat-table-value {
-		line-height: var(--mdui-typescale-headline-small-line-height);
-		color: #303133;
-		font-size: 20px;
-		font-weight: 400;
+	.content-container {
+		width: 98%;
+		margin: 0 auto auto;
+		padding: 0.6em 0.4em;
+		text-align: left;
 	}
-}
 
-.data-stat-card {
-	width: 100%;
-	padding: 0.6em 0.4em;
-}
-
-.main-chart {
-	margin-top: 1rem;
-	height: 400px;
+	.main-chart {
+		margin-top: 1rem;
+		height: 400px;
+	}
 }
 </style>

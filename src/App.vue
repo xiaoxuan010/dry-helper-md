@@ -39,7 +39,6 @@ export default {
 	},
 	methods: {
 		openAppBarDropdown() {
-			// (this.$refs.appBarDropdown as Dropdown).open = true;
 			(this.$refs.appBarDialog as Dialog).open = true;
 		},
 	},
