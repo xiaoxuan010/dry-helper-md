@@ -5,7 +5,8 @@ import AppBarMoreDialog from "@/components/AppBarMoreDialog.vue";
 let appBarTitles = {
 	map: "全省天气观察",
 	overview: "回南天气总览",
-	stats: "回南天气统计",
+	"stats.root": "回南天气统计",
+	"stats.review": "回南过程实况",
 	default: "雾霭图谱",
 };
 
@@ -13,10 +14,6 @@ export default {
 	components: {
 		AppBarMoreDialog,
 	},
-	data() {
-		return {};
-	},
-	mounted() {},
 	computed: {
 		mainRouterID: {
 			get() {
@@ -27,14 +24,15 @@ export default {
 			},
 		},
 		appBarTitle() {
-			switch (this.mainRouterID) {
-				case "map":
-				case "overview":
-				case "stats":
-					return appBarTitles[this.mainRouterID];
-				default:
-					return appBarTitles.default;
-			}
+			// switch (this.$route.name) {
+			// 	case "map":
+			// 	case "overview":
+			// 	case "stats":
+			// 		return appBarTitles[this.$route.name];
+			// 	default:
+			// 		return appBarTitles.default;
+			// }
+			return appBarTitles[this.$route.name as keyof typeof appBarTitles] || appBarTitles.default;
 		},
 	},
 	methods: {
@@ -58,13 +56,15 @@ export default {
 			<AppBarMoreDialog ref="appBarDropdown" />
 		</mdui-dialog>
 
-		<RouterView v-slot="{ Component }" class="main-router-view">
-			<transition name="fade">
-				<KeepAlive>
-					<component :is="Component" />
-				</KeepAlive>
-			</transition>
-		</RouterView>
+		<div class="router-wrapp">
+			<RouterView v-slot="{ Component }" class="main-router-view">
+				<transition name="fade">
+					<KeepAlive>
+						<component :is="Component" />
+					</KeepAlive>
+				</transition>
+			</RouterView>
+		</div>
 
 		<mdui-navigation-bar label-visibility="selected" :value="mainRouterID" @change="mainRouterID = $event.target.value">
 			<mdui-navigation-bar-item value="map" icon="place">地图</mdui-navigation-bar-item>
@@ -75,14 +75,23 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-#appBarDropdown {
-	position: fixed;
-	width: 100vh;
-	right: 0;
+.app-root {
+	overflow: hidden;
 }
 
+.router-wrapper {
+	position: absolute;
+	top: 4.5rem;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
 .main-router-view {
 	position: absolute;
+	left: 0;
+	top: 4.5rem;
+	margin: 0 auto;
+	max-width: 63.875rem;
 	width: 100%;
 }
 

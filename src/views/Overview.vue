@@ -77,12 +77,15 @@ fetchData();
 
 <style scoped lang="scss">
 .root {
-	width: 98%;
+	width: 100%;
 	text-align: center;
+	left: 0;
+	right: 0;
 
 	.data-stat-card {
-		width: 98%;
+		width: 96%;
 		padding: 0.6em 0.4em;
+		margin: 0 auto;
 
 		.stat-table {
 			width: 100%;
@@ -109,14 +112,14 @@ fetchData();
 	}
 
 	.content-container {
-		width: 98%;
-		margin: 0 auto auto;
-		padding: 0.6em 0.4em;
+		width: 96%;
+		margin: 1em auto;
+		// padding: 0.6em 0.4em;
 		text-align: left;
 	}
 
 	.main-chart {
-		margin-top: 1rem;
+		margin-top: 1em;
 		height: 400px;
 	}
 }

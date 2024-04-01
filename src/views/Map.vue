@@ -403,12 +403,13 @@ class ThreeMap {
 
 	updateCSSLabel() {
 		if (this.cityTooltip && this.cityTooltipPos) {
-			const speed = 1;
+			const speed = 2;
 
 			const dx = this.cityTooltipPos.x - this.cityTooltip.position.x;
 			const dy = this.cityTooltipPos.y - this.cityTooltip.position.y;
 			const distance = Math.sqrt(dx * dx + dy * dy);
-			const velocity = Math.min(0.05, distance / speed);
+			const velocity = Math.min(0.4, distance * speed);
+			// console.log(distance / speed < 0.4 ? "slow" : "fast");
 
 			this.cityTooltip.position.x += dx * velocity;
 			this.cityTooltip.position.y += dy * velocity;
