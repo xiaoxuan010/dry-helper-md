@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
-const route = useRoute();
+import history from "@/data/weathers/history.json";
+
 const router = useRouter();
 
-function gotoReview(id: string) {
-	router.push({ name: "stats.review" });
+function gotoReview(startDate: string) {
+	router.push({ name: "stats.review", params: { startDate } });
 }
 </script>
 
@@ -13,8 +14,12 @@ function gotoReview(id: string) {
 	<div class="stats-root">
 		<mdui-list>
 			<mdui-list-subheader>往年回南天记录 </mdui-list-subheader>
-			<mdui-list-item end-icon="arrow_right" description="持续3天" @click="gotoReview('1')">2024/03/05 </mdui-list-item>
-			<mdui-list-item end-icon="arrow_right" description="持续1天">2024/03/16</mdui-list-item>
+			<div v-for="huinan in history">
+				<mdui-list-item end-icon="arrow_right" @click="gotoReview(huinan.startDate)">
+					{{ huinan.startDate }}
+					<span slot="description">持续{{ huinan.days }}天</span>
+				</mdui-list-item>
+			</div>
 		</mdui-list>
 	</div>
 </template>

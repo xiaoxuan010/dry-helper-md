@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
 				component: () => import("@/views/StatsRoot.vue"),
 			},
 			{
-				path: "review",
+				path: "review/:startDate",
 				name: "stats.review",
 				component: () => import("@/views/HuinanReplay.vue"),
 			},
