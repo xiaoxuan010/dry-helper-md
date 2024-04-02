@@ -1,17 +1,26 @@
 <script setup lang="ts">
-import { ref, computed, createApp } from "vue";
+import { ref, computed, onMounted, provide } from "vue";
 
-import { use } from "echarts/core";
-
+import { use, registerTheme } from "echarts/core";
+import { LineChart } from "echarts/charts";
+import { LegendComponent, TooltipComponent, DatasetComponent, GridComponent } from "echarts/components";
 import { SVGRenderer } from "echarts/renderers";
-import { LineChart, BarChart } from "echarts/charts";
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent } from "echarts/components";
+import type { ComposeOption } from "echarts/core";
+import type { LineSeriesOption } from "echarts/charts";
+import type { LegendComponentOption, TooltipComponentOption, DatasetComponentOption, GridComponentOption } from "echarts/components";
 
-import type { EChartsOption } from "echarts";
+use([LegendComponent, TooltipComponent, DatasetComponent, GridComponent, LineChart, SVGRenderer]);
+
+type EChartsOption = ComposeOption<LegendComponentOption | TooltipComponentOption | DatasetComponentOption | GridComponentOption | LineSeriesOption>;
 
 import VChart from "vue-echarts";
 
-use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
+import vintage from "@/config/vintage.json";
+
+import { THEME_KEY } from "vue-echarts";
+
+registerTheme("vintage", vintage);
+// provide(THEME_KEY, "vintage");
 
 const props = defineProps<{
 	data: Array<{ time: number; groundTem: number; airTem: number; dewTem: number }>;

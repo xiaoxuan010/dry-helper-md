@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, provide } from "vue";
 
-import { use } from "echarts/core";
+import { use, registerTheme } from "echarts/core";
 
 import { SVGRenderer } from "echarts/renderers";
 import { LineChart, BarChart } from "echarts/charts";
@@ -10,6 +10,13 @@ import { TitleComponent, TooltipComponent, LegendComponent, GridComponent, Datas
 import type { EChartsOption } from "echarts";
 
 import VChart from "vue-echarts";
+
+import vintage from "@/config/vintage.json";
+
+import { THEME_KEY } from "vue-echarts";
+
+registerTheme("vintage", vintage);
+// provide(THEME_KEY, "vintage");
 
 use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
 
