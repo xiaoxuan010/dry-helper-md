@@ -3,5 +3,17 @@ export default {};
 </script>
 
 <template>
-	<RouterView />
+	<div class="root">
+		<RouterView />
+	</div>
 </template>
+
+<style scoped lang="scss">
+.root {
+	width: 100%;
+	max-width: 63.875rem;
+	text-align: center;
+	left: 0;
+	right: 0;
+}
+</style>

@@ -90,7 +90,6 @@ export default {
 	left: 0;
 	top: 4.5rem;
 	margin: 0 auto;
-	max-width: 63.875rem;
 	width: 100%;
 }
 

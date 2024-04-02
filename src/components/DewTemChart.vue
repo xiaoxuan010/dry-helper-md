@@ -20,7 +20,7 @@ import vintage from "@/config/vintage.json";
 import { THEME_KEY } from "vue-echarts";
 
 registerTheme("vintage", vintage);
-// provide(THEME_KEY, "vintage");
+provide(THEME_KEY, "vintage");
 
 const props = defineProps<{
 	data: Array<{ time: number; groundTem: number; airTem: number; dewTem: number }>;
@@ -64,6 +64,7 @@ const option = computed<EChartsOption>(() => ({
 	},
 	yAxis: {
 		type: "value",
+		min: val => val.min - 2,
 	},
 	series: [
 		{ type: "line", name: "地面温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 } },

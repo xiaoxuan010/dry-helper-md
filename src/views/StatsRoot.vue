@@ -38,11 +38,8 @@ let historyDatasMetaData = history.map(historyData => {
 
 <style scoped lang="scss">
 .root {
-	width: 100%;
-	text-align: center;
-	left: 0;
-	right: 0;
 	.container {
+		margin: 0 auto;
 		text-align: left;
 	}
 }

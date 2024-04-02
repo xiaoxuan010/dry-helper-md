@@ -20,11 +20,6 @@
 
 <style scoped lang="scss">
 .root {
-	width: 100%;
-	text-align: center;
-	left: 0;
-	right: 0;
-
 	.main-content {
 		text-align: left;
 		position: relative;

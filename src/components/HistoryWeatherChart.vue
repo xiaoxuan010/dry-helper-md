@@ -16,7 +16,7 @@ import vintage from "@/config/vintage.json";
 import { THEME_KEY } from "vue-echarts";
 
 registerTheme("vintage", vintage);
-// provide(THEME_KEY, "vintage");
+provide(THEME_KEY, "vintage");
 
 use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
 
@@ -43,10 +43,10 @@ function tooltipFormatter(params: any) {
 		res += `<div class="tooltip-line"><span class="line-subtitle">${params[1].marker} ${params[1].seriesName}</span><span class="line-value">${params[1].value.lowTem}℃</span></div>`;
 
 	if (params[2].value.highHum)
-		res += `<div class="tooltip-line"><span class="line-subtitle">${params[2].marker} ${params[2].seriesName}</span><span class="line-value">${params[2].value.highHum}℃</span></div>`;
+		res += `<div class="tooltip-line"><span class="line-subtitle">${params[2].marker} ${params[2].seriesName}</span><span class="line-value">${params[2].value.highHum}%</span></div>`;
 
 	if (params[3].value.lowHum)
-		res += `<div class="tooltip-line"><span class="line-subtitle">${params[3].marker} ${params[3].seriesName}</span><span class="line-value">${params[3].value.lowHum}℃</span></div>`;
+		res += `<div class="tooltip-line"><span class="line-subtitle">${params[3].marker} ${params[3].seriesName}</span><span class="line-value">${params[3].value.lowHum}%</span></div>`;
 
 	res += "</div>";
 
@@ -82,19 +82,21 @@ const option = computed<EChartsOption>(() => ({
 			axisLabel: {
 				formatter: "{value}℃",
 			},
+			min: val => val.min - 2,
 		},
 		{
 			type: "value",
 			axisLabel: {
 				formatter: "{value}%",
 			},
+			min: val => val.min - 10,
 		},
 	],
 	series: [
-		{ type: "line", name: seriesName.highTem, smooth: 1, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 }, yAxisIndex: 0 },
-		{ type: "line", name: seriesName.lowTem, smooth: 1, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 }, yAxisIndex: 0 },
-		{ type: "line", name: seriesName.highHum, smooth: 1, symbol: "circle", showSymbol: false, encode: { x: 0, y: 3 }, yAxisIndex: 1 },
-		{ type: "line", name: seriesName.lowHum, smooth: 1, symbol: "circle", showSymbol: false, encode: { x: 0, y: 4 }, yAxisIndex: 1 },
+		{ type: "line", name: seriesName.highTem, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 }, yAxisIndex: 0 },
+		{ type: "line", name: seriesName.lowTem, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 }, yAxisIndex: 0 },
+		{ type: "line", name: seriesName.highHum, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 3 }, yAxisIndex: 1 },
+		{ type: "line", name: seriesName.lowHum, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 4 }, yAxisIndex: 1 },
 	],
 }));
 </script>

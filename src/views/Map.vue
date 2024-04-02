@@ -212,6 +212,8 @@ class ThreeMap {
 		const onMouseMove = (event: MouseEvent) => {
 			this.mouse = new THREE.Vector2((event.offsetX / this.canvasWidth) * 2 - 1, -(event.offsetY / this.canvasHeight) * 2 + 1);
 		};
+
+		// 设置点击
 		threeMapDiv.value?.addEventListener("mousemove", onMouseMove, false);
 		const onMouseClick = (event: MouseEvent) => {
 			if (!this.rayCastUpdate()) {
@@ -225,6 +227,17 @@ class ThreeMap {
 		threeMapDiv.value?.addEventListener("click", onMouseClick, false);
 
 		this.zoomInAnimation();
+	}
+
+	resize(width: number, height: number) {
+		this.canvasWidth = width;
+		this.canvasHeight = height;
+
+		this.camera.aspect = width / height;
+		this.camera.updateProjectionMatrix();
+
+		this.renderer.setSize(width, height);
+		this.renderCSS3D.setSize(width, height);
 	}
 
 	render() {
@@ -525,6 +538,12 @@ let threeMap: ThreeMap | undefined = undefined;
 onMounted(() => {
 	let widthNum = parseFloat(window.getComputedStyle(threeMapDiv.value!).width.replace("px", ""));
 	let heightNum = parseFloat(window.getComputedStyle(threeMapDiv.value!).height.replace("px", ""));
+
+	window.addEventListener("resize", () => {
+		let widthNum = parseFloat(window.getComputedStyle(threeMapDiv.value!).width.replace("px", ""));
+		let heightNum = parseFloat(window.getComputedStyle(threeMapDiv.value!).height.replace("px", ""));
+		threeMap?.resize(widthNum, heightNum);
+	});
 
 	fetchGdData().finally(() => {
 		threeMap = new ThreeMap(threeMapDiv.value!, cityNameLabelDiv.value!, widthNum, heightNum);
