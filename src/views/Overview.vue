@@ -30,7 +30,7 @@ function fetchData() {
 		})
 		.then(data => {
 			// 调试
-			console.log(data);
+			// console.log(data);
 
 			// 更新数据
 			dataTimestamp.value = data.timestamp;

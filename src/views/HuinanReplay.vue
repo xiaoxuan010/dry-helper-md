@@ -1,5 +1,5 @@
 <template>
-	<div class="huinan-replay-root">
+	<div class="huinan-replay-root root">
 		<div class="main-content mdui-prose">
 			<!-- <mdui-card class="summary-card" variant="outlined"> -->
 			<h2>概览</h2>
@@ -19,21 +19,23 @@
 </template>
 
 <style scoped lang="scss">
-.main-content {
-	position: relative;
+.root {
+	width: 100%;
+	text-align: center;
 	left: 0;
+	right: 0;
 
-	padding: 1em;
+	.main-content {
+		text-align: left;
+		position: relative;
+		left: 0;
 
-	margin: 0 auto;
-	padding: 1em;
+		padding: 1em;
+
+		margin: 0 auto;
+		padding: 1em;
+	}
 }
-
-// .summary-card {
-// 	width: 100%;
-// 	margin: 1em auto;
-// 	padding: 0.75em 0.5em;
-// }
 </style>
 
 <script setup>

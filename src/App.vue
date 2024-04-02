@@ -24,20 +24,18 @@ export default {
 			},
 		},
 		appBarTitle() {
-			// switch (this.$route.name) {
-			// 	case "map":
-			// 	case "overview":
-			// 	case "stats":
-			// 		return appBarTitles[this.$route.name];
-			// 	default:
-			// 		return appBarTitles.default;
-			// }
 			return appBarTitles[this.$route.name as keyof typeof appBarTitles] || appBarTitles.default;
+		},
+		isHuinanReview() {
+			return this.$route.name == "stats.review";
 		},
 	},
 	methods: {
 		openAppBarDropdown() {
 			(this.$refs.appBarDialog as Dialog).open = true;
+		},
+		navigateBack() {
+			window.history.back();
 		},
 	},
 };
@@ -46,7 +44,8 @@ export default {
 <template>
 	<div class="app-root" id="app-root">
 		<mdui-top-app-bar variant="small">
-			<mdui-button-icon icon="water_drop" href="/#/overview"></mdui-button-icon>
+			<mdui-button-icon v-if="isHuinanReview" icon="arrow_back" @click="navigateBack"></mdui-button-icon>
+			<mdui-button-icon v-else icon="water_drop" href="/#/overview"></mdui-button-icon>
 			<mdui-top-app-bar-title>{{ appBarTitle }}</mdui-top-app-bar-title>
 			<div style="flex-grow: 1"></div>
 			<mdui-button-icon icon="more_vert" ref="appBarMoreBtn" @click="openAppBarDropdown"></mdui-button-icon>

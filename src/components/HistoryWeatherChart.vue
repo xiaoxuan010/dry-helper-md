@@ -26,8 +26,6 @@ let seriesName = {
 };
 
 function tooltipFormatter(params: any) {
-	console.log(params);
-
 	let datetime = new Date(params[0].name).toLocaleString();
 	let res = `<div class="tooltip-content"><div class="tooltip-line tooltip-title"><span> ` + datetime + "</span></div>";
 
