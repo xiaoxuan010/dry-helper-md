@@ -19,7 +19,7 @@ import * as gdGeoJson from "@/data/maps/gd.geo.json";
 const threeMapDiv: Ref<HTMLElement | null> = ref(null);
 const cityNameLabelDiv: Ref<HTMLElement | null> = ref(null);
 
-const gdCityWeathers: Ref<{ [key: string]: { temperature: number; humidity: number; range: string; reportTime: string } }> = ref({});
+const gdCityWeathers: Ref<{ [key: string]: { temperature: number; humidity: number; range: string; reportTime: string } } | null> = ref(null);
 
 async function fetchGdData() {
 	const API_PREFIX = "/api";
@@ -28,6 +28,7 @@ async function fetchGdData() {
 		.get("/gd", { baseURL: API_PREFIX })
 		.then(response => response.data)
 		.then(data => {
+			gdCityWeathers.value = {};
 			for (let key in data) {
 				let info = data[key].lives[0];
 				let cityName = info.city;
@@ -98,6 +99,7 @@ class ThreeMap {
 	hoverCityName: Ref<string> = ref("");
 	posTween: any;
 	cityTooltipPos: THREE.Vector3 | null = null;
+	isInitAnimationCompleted: boolean = false;
 
 	constructor(divElement: HTMLElement, cityLabelDivElement: HTMLElement, width: number, height: number) {
 		// 新建场景
@@ -407,11 +409,13 @@ class ThreeMap {
 	}
 
 	getTooltipContent = computed(() => {
-		return [
-			{ key: "气温", value: gdCityWeathers.value[this.hoverCityName.value].temperature + "℃" },
-			{ key: "湿度", value: gdCityWeathers.value[this.hoverCityName.value].humidity + "%" },
-			{ key: "回南天", value: gdCityWeathers.value[this.hoverCityName.value].range },
-		];
+		if (gdCityWeathers.value)
+			return [
+				{ key: "气温", value: gdCityWeathers.value[this.hoverCityName.value]?.temperature + "℃" },
+				{ key: "湿度", value: gdCityWeathers.value[this.hoverCityName.value]?.humidity + "%" },
+				{ key: "回南天", value: gdCityWeathers.value[this.hoverCityName.value]?.range },
+			];
+		else return [];
 	});
 
 	updateCSSLabel() {
@@ -503,7 +507,25 @@ class ThreeMap {
 				});
 			});
 
+		// 动画开始
+		tween1.start();
+		tween2.delay(3200).start();
+		tween3.delay(3000).start();
+		setTimeout(() => {
+			if (gdCityWeathers.value) {
+				this.gdCityColorAnimate();
+			} else {
+				this.isInitAnimationCompleted = true;
+			}
+		}, 4000);
+	}
+
+	gdCityColorAnimate() {
 		// 动画4：广东地图城市颜色渐变
+		if (!gdCityWeathers.value) {
+			console.error("[错误] 地图颜色绘制在意料之外的时机调用。");
+			return;
+		}
 		let cityMapColorEase = new Object() as { [key: string]: THREE.Color };
 		this.gdMap.children.forEach(city => {
 			cityMapColorEase[city.name] = (
@@ -516,20 +538,16 @@ class ThreeMap {
 			cityMapColorTarget[key] = cityMapColorEase[key];
 			let weatherInfo = gdCityWeathers.value[key];
 			if (weatherInfo) {
-				let h = Math.pow(weatherInfo.humidity / 100, 10);
-				let c2 = new THREE.Color("#619A7F"); // 浅绿
+				let h = Math.pow(weatherInfo.humidity / 100, 4);
+				let c2 = new THREE.Color("#4FC1DB"); // 蓝
+				// let c2 = new THREE.Color("#619A7F"); // 浅绿
 				// let c2 = new THREE.Color("#006E1C"); // 深绿
 
 				cityMapColorTarget[key] = cityMapColorTarget[key].clone();
 				cityMapColorTarget[key].lerp(c2, h);
 			}
 		}
-
-		// 动画开始
-		tween1.start();
-		tween2.delay(3200).start();
-		tween3.delay(3000).start();
-		cityMapTween.delay(4000).start();
+		cityMapTween.start();
 	}
 }
 
@@ -545,10 +563,12 @@ onMounted(() => {
 		threeMap?.resize(widthNum, heightNum);
 	});
 
-	fetchGdData().finally(() => {
-		threeMap = new ThreeMap(threeMapDiv.value!, cityNameLabelDiv.value!, widthNum, heightNum);
-		threeMap.animate();
+	fetchGdData().then(() => {
+		if (threeMap?.isInitAnimationCompleted) threeMap.gdCityColorAnimate();
 	});
+
+	threeMap = new ThreeMap(threeMapDiv.value!, cityNameLabelDiv.value!, widthNum, heightNum);
+	threeMap.animate();
 });
 
 onUnmounted(() => {
