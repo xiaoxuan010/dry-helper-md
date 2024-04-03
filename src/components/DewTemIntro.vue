@@ -1,7 +1,7 @@
 <template>
 	<div class="root">
 		<div class="mdui-prose">
-			<h2>露点地温差</h2>
+			<h3>露点地温差</h3>
 			<div>
 				<samll><mdui-icon name="circle" style="font-size: 10px; color: green"></mdui-icon> 绿色：<=-0.5 </samll>
 				<span

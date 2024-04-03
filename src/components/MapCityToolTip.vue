@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 import type { PropType, Ref, ComputedRef } from "vue";
-import { onMounted } from "vue";
 
 const props = defineProps({
 	title: {

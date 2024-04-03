@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { ref,type Ref } from "vue";
+import { ref, type Ref, computed } from "vue";
 
 import DewTemChart from "@/components/DewTemChart.vue";
-import DewTemIntro from "@/components/DewTemIntro.vue"
+import DewTemIntro from "@/components/DewTemIntro.vue";
 
-import type { Dialog } from 'mdui';
+import type { Dialog } from "mdui";
 
 import axios from "axios";
 
@@ -68,12 +68,19 @@ function fetchData() {
 }
 fetchData();
 
-const DewTemDialog:Ref<Dialog|undefined> = ref(undefined);
+const DewTemDialog: Ref<Dialog | undefined> = ref(undefined);
 
 function openDewTemIntro() {
-	if(DewTemDialog.value)
-	DewTemDialog.value.open = true;
+	if (DewTemDialog.value) DewTemDialog.value.open = true;
 }
+
+const temColor = computed(() => {
+	let cha = rtData.value.dewTem - rtData.value.groundTem;
+	if (cha <= -0.5) return "#1A9900";
+	else if (cha <= 2) return "#FE8D59";
+	else if (cha > 2) return "#FF0000";
+	else return "#aaa";
+});
 </script>
 
 <template>
@@ -88,13 +95,13 @@ function openDewTemIntro() {
 					<td>地面温度</td>
 					<td>相对湿度</td>
 					<td>露点温度</td>
-					<td @click="openDewTemIntro">露点地温差<mdui-icon name="info" style="font-size: inherit;"></mdui-icon></td>
+					<td @click="openDewTemIntro">露点地温差<mdui-icon name="info" style="font-size: inherit"></mdui-icon></td>
 				</tr>
 				<tr class="stat-table-value">
 					<td>{{ rtData.groundTem.toFixed(0) }} ℃</td>
 					<td>{{ rtData.humidity.toFixed(0) }} %</td>
 					<td>{{ rtData.dewTem.toFixed(0) }} ℃</td>
-					<td @click="openDewTemIntro">{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
+					<td @click="openDewTemIntro" :style="{ color: temColor }">{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
 				</tr>
 			</table>
 		</mdui-card>
@@ -112,12 +119,13 @@ function openDewTemIntro() {
 			<mdui-card variant="outlined" class="content-card mdui-prose">
 				<div id="forcase-container">
 					<h4>天气实况</h4>
-					<p>{{ forcase }}
+					<div>
+						{{ forcase }}
 						<div class="right-comment">
 							<small class="comment-content"> 数据来源：广州市气象台 </small>
 						</div>
-					</p>
 					</div>
+				</div>
 			</mdui-card>
 		</div>
 	</div>
