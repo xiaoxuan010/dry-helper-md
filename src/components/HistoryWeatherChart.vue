@@ -5,9 +5,9 @@ import { use, registerTheme } from "echarts/core";
 
 import { SVGRenderer } from "echarts/renderers";
 import { LineChart, BarChart } from "echarts/charts";
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent } from "echarts/components";
+import { TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent, MarkPointComponent } from "echarts/components";
 
-import type { EChartsOption } from "echarts";
+// import type { EChartsOption } from "echarts";
 
 import VChart from "vue-echarts";
 
@@ -18,7 +18,15 @@ import { THEME_KEY } from "vue-echarts";
 registerTheme("vintage", vintage);
 provide(THEME_KEY, "vintage");
 
-use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent]);
+use([SVGRenderer, LineChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, DatasetComponent, MarkPointComponent]);
+
+import type { ComposeOption } from "echarts/core";
+import type { LineSeriesOption } from "echarts/charts";
+import type { LegendComponentOption, TooltipComponentOption, DatasetComponentOption, GridComponentOption, MarkPointComponentOption } from "echarts/components";
+
+type EChartsOption = ComposeOption<
+	LegendComponentOption | TooltipComponentOption | DatasetComponentOption | GridComponentOption | MarkPointComponentOption | LineSeriesOption
+>;
 
 const props = defineProps<{
 	data: Array<{ time: number; groundTem: number; airTem: number; dewTem: number }>;
@@ -61,7 +69,7 @@ const option = computed<EChartsOption>(() => ({
 		left: 20,
 		right: 20,
 		bottom: 40,
-		top: 20,
+		top: 40,
 		containLabel: true,
 	},
 	tooltip: {
@@ -95,7 +103,28 @@ const option = computed<EChartsOption>(() => ({
 	series: [
 		{ type: "line", name: seriesName.highTem, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 }, yAxisIndex: 0 },
 		{ type: "line", name: seriesName.lowTem, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 }, yAxisIndex: 0 },
-		{ type: "line", name: seriesName.highHum, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 3 }, yAxisIndex: 1 },
+		{
+			type: "line",
+			name: seriesName.highHum,
+			smooth: true,
+			symbol: "circle",
+			showSymbol: false,
+			encode: { x: 0, y: 3 },
+			yAxisIndex: 1,
+			markPoint: {
+				symbol: "pin",
+				// symbolRotate: 180,
+				data: [
+					{
+						name: "最大值",
+						type: "max",
+						label: {
+							formatter: "{c}%",
+						},
+					},
+				],
+			},
+		},
 		{ type: "line", name: seriesName.lowHum, smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 4 }, yAxisIndex: 1 },
 	],
 }));

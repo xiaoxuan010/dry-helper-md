@@ -27,8 +27,10 @@ const props = defineProps<{
 }>();
 
 function tooltipFormatter(params: any) {
-	let datetime = new Date(params[0].name).toLocaleString();
-	let res = `<div class="tooltip-content"><div class="tooltip-line tooltip-title"><span> ` + datetime + "</span></div>";
+	let datetime = new Date(params[0].name);
+	let dtStr = datetime.toLocaleDateString() + " " + datetime.getHours() + "时";
+
+	let res = `<div class="tooltip-content"><div class="tooltip-line tooltip-title"><span> ` + dtStr + "</span></div>";
 
 	res += `<div class="tooltip-line"><span class="line-subtitle">${params[0].marker}地面温度</span><span class="line-value">${params[0].value.groundTem}℃</span></div>`;
 	res += `<div class="tooltip-line"><span class="line-subtitle">${params[1].marker}空气温度</span><span class="line-value">${params[1].value.airTem}℃</span></div>`;
@@ -67,9 +69,9 @@ const option = computed<EChartsOption>(() => ({
 		min: val => val.min - 2,
 	},
 	series: [
-		{ type: "line", name: "地面温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 1 } },
+		{ type: "line", name: "地面温度", smooth: true, symbol: "circle", showSymbol: false, areaStyle: {}, encode: { x: 0, y: 1 } },
 		{ type: "line", name: "空气温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 2 } },
-		{ type: "line", name: "露点温度", smooth: true, symbol: "circle", showSymbol: false, encode: { x: 0, y: 3 } },
+		{ type: "line", name: "露点温度", smooth: true, symbol: "circle", showSymbol: false, areaStyle: {}, encode: { x: 0, y: 3 } },
 	],
 }));
 </script>
