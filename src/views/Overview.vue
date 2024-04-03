@@ -1,7 +1,10 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref,type Ref } from "vue";
 
 import DewTemChart from "@/components/DewTemChart.vue";
+import DewTemIntro from "@/components/DewTemIntro.vue"
+
+import type { Dialog } from 'mdui';
 
 import axios from "axios";
 
@@ -13,6 +16,7 @@ const rtData = ref({
 	dewTem: 0,
 });
 const rangeData = ref([{ time: 0, groundTem: 0, airTem: 0, dewTem: 0 }]);
+const forcase = ref("");
 
 function fetchData() {
 	const API_PREFIX = "/api";
@@ -45,32 +49,76 @@ function fetchData() {
 			console.error("Failed to fetch data.");
 			console.error(err);
 		});
+
+	axios.get("/forcase", { baseURL: API_PREFIX })
+		.then(res => res.data)
+		.then(resBody => {
+			if (resBody.code != 0) {
+				throw new Error(resBody.msg);
+			}
+			return resBody.data;
+		})
+		.then(data => {
+			forcase.value = data.forcaseData_gz;
+		})
+		.catch(err => {
+			console.error("Failed to fetch forcase.");
+			console.error(err);
+		});
 }
 fetchData();
+
+const DewTemDialog:Ref<Dialog|undefined> = ref(undefined);
+
+function openDewTemIntro() {
+	if(DewTemDialog.value)
+	DewTemDialog.value.open = true;
+}
 </script>
 
 <template>
 	<div id="overview-root" class="root">
+		<mdui-dialog close-on-overlay-click ref="DewTemDialog">
+			<DewTemIntro />
+		</mdui-dialog>
+
 		<mdui-card class="data-stat-card" variant="outlined">
 			<table class="stat-table">
 				<tr class="stat-table-title">
 					<td>地面温度</td>
 					<td>相对湿度</td>
 					<td>露点温度</td>
-					<td>露点地温差</td>
+					<td @click="openDewTemIntro">露点地温差<mdui-icon name="info" style="font-size: inherit;"></mdui-icon></td>
 				</tr>
 				<tr class="stat-table-value">
 					<td>{{ rtData.groundTem.toFixed(0) }} ℃</td>
 					<td>{{ rtData.humidity.toFixed(0) }} %</td>
 					<td>{{ rtData.dewTem.toFixed(0) }} ℃</td>
-					<td>{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
+					<td @click="openDewTemIntro">{{ (rtData.dewTem - rtData.groundTem).toFixed(0) }} ℃</td>
 				</tr>
 			</table>
 		</mdui-card>
+		<div class="right-comment">
+			<small class="comment-content" v-if="dataTimestamp">
+				数据更新时间：<span>{{ dataTimestamp }}</span>
+			</small>
+		</div>
 
-		<div id="overview-content" class="content-container mdui-prose">
-			<h4>24小时温度数据</h4>
+		<div id="overview-content" class="content-container">
+			<div class="mdui-prose">
+				<h4>48小时温度数据</h4>
+			</div>
 			<DewTemChart :data="rangeData" class="main-chart" />
+			<mdui-card variant="outlined" class="content-card mdui-prose">
+				<div id="forcase-container">
+					<h4>天气实况</h4>
+					<p>{{ forcase }}
+						<div class="right-comment">
+							<small class="comment-content"> 数据来源：广州市气象台 </small>
+						</div>
+					</p>
+					</div>
+			</mdui-card>
 		</div>
 	</div>
 </template>
@@ -114,14 +162,34 @@ fetchData();
 
 	.content-container {
 		width: 96%;
-		margin: 1em auto;
-		// padding: 0.6em 0.4em;
-		text-align: left;
+		margin: 0 auto;
+
+		.mdui-prose {
+			padding: 0.4em 0.6em;
+			text-align: left;
+		}
+
+		.content-card {
+			margin: 1em auto;
+			width: 96%;
+			padding: 1em;
+		}
 	}
 
 	.main-chart {
 		margin-top: 1em;
 		height: 400px;
+	}
+}
+
+.right-comment {
+	text-align: right;
+	width: 96%;
+	margin-top: 0;
+
+	.comment-content {
+		font-size: 80%;
+		opacity: 0.8;
 	}
 }
 </style>
