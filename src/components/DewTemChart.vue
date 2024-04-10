@@ -26,19 +26,25 @@ const props = defineProps<{
 	data: Array<{ time: number; groundTem: number; airTem: number; dewTem: number }>;
 }>();
 
+let valKeys = ["groundTem", "airTem", "dewTem"];
+
 function tooltipFormatter(params: any) {
 	let datetime = new Date(params[0].name);
 	let dtStr = datetime.toLocaleDateString() + " " + datetime.getHours() + "时";
 
-	let res = `<div class="tooltip-content"><div class="tooltip-line tooltip-title"><span> ` + dtStr + "</span></div>";
-
-	res += `<div class="tooltip-line"><span class="line-subtitle">${params[0].marker}地面温度</span><span class="line-value">${params[0].value.groundTem}℃</span></div>`;
-	res += `<div class="tooltip-line"><span class="line-subtitle">${params[1].marker}空气温度</span><span class="line-value">${params[1].value.airTem}℃</span></div>`;
-	res += `<div class="tooltip-line"><span class="line-subtitle">${params[2].marker}露点温度</span><span class="line-value">${params[2].value.dewTem}℃</span></div>`;
-
-	res += "</div>";
-
-	return res;
+	return (
+		`<div class="tooltip-content"><div class="tooltip-line tooltip-title"><span> ` +
+		dtStr +
+		"</span></div>" +
+		(params
+			.map((param: any) => {
+				return `<div class="tooltip-line"><span class="line-subtitle">${param.marker}地面温度</span><span class="line-value">${
+					param.value[valKeys[param.seriesIndex]]
+				}℃</span></div>`;
+			})
+			.join("") +
+			"</div>")
+	);
 }
 
 const option = computed<EChartsOption>(() => ({
@@ -46,8 +52,8 @@ const option = computed<EChartsOption>(() => ({
 		top: "bottom",
 	},
 	grid: {
-		left: 20,
-		right: 20,
+		left: 30,
+		right: 25,
 		bottom: 40,
 		top: 20,
 		containLabel: true,
@@ -66,7 +72,7 @@ const option = computed<EChartsOption>(() => ({
 	},
 	yAxis: {
 		type: "value",
-		min: val => val.min - 2,
+		min: val => (val.min - 2).toFixed(0),
 	},
 	series: [
 		{ type: "line", name: "地面温度", smooth: true, symbol: "circle", showSymbol: false, areaStyle: {}, encode: { x: 0, y: 1 } },
